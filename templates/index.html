@@ -55,7 +55,19 @@
             <div class="progress-bar">
                 <div id="progress-fill" class="progress-fill"></div>
             </div>
-            <p id="progress-text" class="progress-text">Compressing... 0%</p>
+            <div class="progress-info">
+                <span id="progress-text" class="progress-text">Compressing... 0%</span>
+                <span id="eta-text" class="eta-text"></span>
+            </div>
+        </div>
+
+        <!-- FFmpeg Log Window -->
+        <div id="log-section" class="log-section hidden">
+            <div class="log-header">
+                <span>FFmpeg Output</span>
+                <button id="toggle-log" class="btn-toggle">Hide</button>
+            </div>
+            <div id="log-content" class="log-content"></div>
         </div>
 
         <!-- Result Section -->

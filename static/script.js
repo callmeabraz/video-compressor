@@ -13,6 +13,10 @@ document.addEventListener('DOMContentLoaded', () => {
     const progressSection = document.getElementById('progress-section');
     const progressFill = document.getElementById('progress-fill');
     const progressText = document.getElementById('progress-text');
+    const etaText = document.getElementById('eta-text');
+    const logSection = document.getElementById('log-section');
+    const logContent = document.getElementById('log-content');
+    const toggleLogBtn = document.getElementById('toggle-log');
     const resultSection = document.getElementById('result-section');
     const resultSize = document.getElementById('result-size');
     const downloadBtn = document.getElementById('download-btn');
@@ -34,6 +38,22 @@ document.addEventListener('DOMContentLoaded', () => {
         return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
     }
 
+    function formatEta(seconds) {
+        if (seconds <= 0 || !isFinite(seconds)) return '';
+
+        const hrs = Math.floor(seconds / 3600);
+        const mins = Math.floor((seconds % 3600) / 60);
+        const secs = Math.floor(seconds % 60);
+
+        if (hrs > 0) {
+            return `ETA: ${hrs}h ${mins}m`;
+        } else if (mins > 0) {
+            return `ETA: ${mins}m ${secs}s`;
+        } else {
+            return `ETA: ${secs}s`;
+        }
+    }
+
     function showElement(el) {
         el.classList.remove('hidden');
     }
@@ -47,10 +67,13 @@ document.addEventListener('DOMContentLoaded', () => {
         hideElement(sliderSection);
         hideElement(compressBtn);
         hideElement(progressSection);
+        hideElement(logSection);
         hideElement(resultSection);
         hideElement(errorSection);
         showElement(uploadZone);
         progressFill.style.width = '0%';
+        etaText.textContent = '';
+        logContent.innerHTML = '';
         currentJobId = null;
         originalSize = 0;
         if (pollInterval) {
@@ -58,6 +81,19 @@ document.addEventListener('DOMContentLoaded', () => {
             pollInterval = null;
         }
     }
+
+    function appendLog(message) {
+        const p = document.createElement('p');
+        p.textContent = message;
+        logContent.appendChild(p);
+        logContent.scrollTop = logContent.scrollHeight;
+    }
+
+    // Toggle log visibility
+    toggleLogBtn.addEventListener('click', () => {
+        logContent.classList.toggle('collapsed');
+        toggleLogBtn.textContent = logContent.classList.contains('collapsed') ? 'Show' : 'Hide';
+    });
 
     // Upload zone events
     uploadZone.addEventListener('click', () => fileInput.click());
@@ -94,6 +130,7 @@ document.addEventListener('DOMContentLoaded', () => {
         hideElement(uploadZone);
         showElement(progressSection);
         progressText.textContent = 'Uploading...';
+        etaText.textContent = '';
         progressFill.style.width = '0%';
 
         try {
@@ -165,7 +202,12 @@ document.addEventListener('DOMContentLoaded', () => {
         hideElement(compressBtn);
         hideElement(fileInfo);
         showElement(progressSection);
+        showElement(logSection);
+        logContent.innerHTML = '';
+        logContent.classList.remove('collapsed');
+        toggleLogBtn.textContent = 'Hide';
         progressText.textContent = 'Starting compression...';
+        etaText.textContent = '';
         progressFill.style.width = '0%';
 
         try {
@@ -199,10 +241,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 const response = await fetch(`/status/${currentJobId}`);
                 const data = await response.json();
 
+                // Append new logs
+                if (data.logs && data.logs.length > 0) {
+                    data.logs.forEach(log => appendLog(log));
+                }
+
                 if (data.status === 'compressing') {
                     const percent = Math.round(data.progress * 100);
                     progressFill.style.width = `${percent}%`;
                     progressText.textContent = `Compressing... ${percent}%`;
+
+                    // Update ETA
+                    if (data.eta > 0) {
+                        etaText.textContent = formatEta(data.eta);
+                    } else {
+                        etaText.textContent = '';
+                    }
                 } else if (data.status === 'completed') {
                     clearInterval(pollInterval);
                     pollInterval = null;

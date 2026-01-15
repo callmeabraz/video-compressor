@@ -98,11 +98,20 @@ def compress():
 
     job['status'] = 'compressing'
     job['progress'] = 0
+    job['speed'] = 0
+    job['eta'] = 0
+    job['logs'] = []
+    job['log_index'] = 0
     job['output_path'] = str(output_path)
     job['output_filename'] = output_filename
 
-    def progress_callback(progress):
+    def progress_callback(progress, speed, eta):
         job['progress'] = progress
+        job['speed'] = speed
+        job['eta'] = eta
+
+    def log_callback(message):
+        job['logs'].append(message)
 
     def run_compression():
         try:
@@ -110,7 +119,8 @@ def compress():
                 str(input_path),
                 str(output_path),
                 target_size,
-                progress_callback
+                progress_callback,
+                log_callback
             )
             job['status'] = 'completed'
             job['progress'] = 1.0
@@ -134,8 +144,17 @@ def status(job_id):
     job = jobs[job_id]
     response = {
         'status': job['status'],
-        'progress': job.get('progress', 0)
+        'progress': job.get('progress', 0),
+        'speed': job.get('speed', 0),
+        'eta': job.get('eta', 0)
     }
+
+    # Return new log entries since last poll
+    logs = job.get('logs', [])
+    log_index = job.get('log_index', 0)
+    if len(logs) > log_index:
+        response['logs'] = logs[log_index:]
+        job['log_index'] = len(logs)
 
     if job['status'] == 'completed':
         response['output_size'] = job.get('output_size', 0)
