@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Video Compressor</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Video Compressor</h1>
+        <p class="subtitle">Compress videos to your target file size</p>
+
+        <!-- Upload Zone -->
+        <div id="upload-zone" class="upload-zone">
+            <div class="upload-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                    <polyline points="17 8 12 3 7 8"></polyline>
+                    <line x1="12" y1="3" x2="12" y2="15"></line>
+                </svg>
+            </div>
+            <p>Drag & drop video here</p>
+            <p class="hint">or click to browse</p>
+            <input type="file" id="file-input" accept=".mp4,.avi,.mov,.mkv,.wmv,.flv,.webm" hidden>
+        </div>
+
+        <!-- File Info -->
+        <div id="file-info" class="file-info hidden">
+            <div class="file-details">
+                <span id="file-name" class="file-name"></span>
+                <span id="file-size" class="file-size"></span>
+            </div>
+            <button id="remove-file" class="btn-remove" title="Remove file">&times;</button>
+        </div>
+
+        <!-- Size Slider -->
+        <div id="slider-section" class="slider-section hidden">
+            <label for="size-slider">Target Size</label>
+            <div class="slider-container">
+                <input type="range" id="size-slider" min="100" max="2000" value="500" step="50">
+                <div class="slider-labels">
+                    <span>100 MB</span>
+                    <span id="slider-value">500 MB</span>
+                    <span>2 GB</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Compress Button -->
+        <button id="compress-btn" class="btn-compress hidden">Compress Video</button>
+
+        <!-- Progress Section -->
+        <div id="progress-section" class="progress-section hidden">
+            <div class="progress-bar">
+                <div id="progress-fill" class="progress-fill"></div>
+            </div>
+            <p id="progress-text" class="progress-text">Compressing... 0%</p>
+        </div>
+
+        <!-- Result Section -->
+        <div id="result-section" class="result-section hidden">
+            <div class="result-info">
+                <p>Compression complete!</p>
+                <p id="result-size" class="result-size"></p>
+            </div>
+            <button id="download-btn" class="btn-download">Download Compressed Video</button>
+            <button id="new-video-btn" class="btn-new">Compress Another Video</button>
+        </div>
+
+        <!-- Error Section -->
+        <div id="error-section" class="error-section hidden">
+            <p id="error-message"></p>
+            <button id="retry-btn" class="btn-retry">Try Again</button>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

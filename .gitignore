@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+.env
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Uploads and outputs (large files)
+uploads/
+outputs/
+
+# FFmpeg temp files
+ffmpeg2pass*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
